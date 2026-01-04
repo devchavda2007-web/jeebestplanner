@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JEE Smart Planner 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI, sans-serif;
+    background:linear-gradient(135deg,#6a7be8,#7a5dbb);
+    min-height:100vh;
+}
+h1{text-align:center;color:#fff;padding:20px;margin:0}
+.container{
+    background:#fff;
+    max-width:1100px;
+    margin:20px auto;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.2);
+}
+.hidden{display:none}
+
+.subject-buttons{
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+.subject-buttons button{
+    flex:1;
+    min-width:200px;
+    padding:25px;
+    font-size:20px;
+    position:relative;
+}
+.subject-buttons button .badge{
+    position:absolute;
+    top:5px;
+    right:5px;
+    background:#4caf50;
+    color:white;
+    border-radius:50%;
+    width:24px;
+    height:24px;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.chapter{
+    border:2px solid #eee;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:12px;
+    transition:all 0.3s;
+}
+.chapter:hover{
+    border-color:#6f85ea;
+    box-shadow:0 2px 8px rgba(111,133,234,0.2);
+}
+.chapter-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+.chapter b{font-size:16px}
+.avg{color:#666;font-size:14px}
+.rating-container{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-top:10px;
+}
+.rating-container input[type="range"]{
+    flex:1;
+}
+.rating-value{
+    font-weight:bold;
+    color:#6f85ea;
+    min-width:60px;
+    text-align:center;
+    font-size:18px;
+}
+
+button{
+    padding:12px 24px;
+    border:none;
+    border-radius:10px;
+    background:#6f85ea;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:all 0.3s;
+}
+button:hover{
+    background:#5c72dd;
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(111,133,234,0.4);
+}
+button:active{transform:translateY(0)}
+
+.button-group{
+    display:flex;
+    gap:15px;
+    margin-top:20px;
+}
+.button-group button{flex:1}
+
+.summary{
+    background:#f4f6ff;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    border-left:4px solid #6f85ea;
+}
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:15px;
+    margin-top:10px;
+}
+.summary-item{
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+}
+.summary-item strong{
+    color:#6f85ea;
+    font-size:24px;
+    display:block;
+    margin-top:5px;
+}
+
+.input-group{
+    margin-bottom:20px;
+}
+.input-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#333;
+}
+.input-group input{
+    width:100%;
+    padding:12px;
+    border:2px solid #ddd;
+    border-radius:8px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+.input-group input:focus{
+    outline:none;
+    border-color:#6f85ea;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+th,td{
+    border:1px solid #ddd;
+    padding:12px 8px;
+    text-align:left;
+}
+th{
+    background:#6f85ea;
+    color:white;
+    font-weight:600;
+}
+tr:nth-child(even){background:#f9f9f9}
+tr:hover{background:#f0f4ff}
+
+.progress-bar{
+    width:100%;
+    height:8px;
+    background:#e0e0e0;
+    border-radius:4px;
+    margin-top:10px;
+    overflow:hidden;
+}
+.progress-fill{
+    height:100%;
+    background:#6f85ea;
+    transition:width 0.3s;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎯 JEE Smart Planner 2026</h1>
+
+<!-- STEP 1 -->
+<div class="container" id="step1">
+<h2>Select Subject to Review</h2>
+<div class="summary">
+    <p>Rate each chapter based on your current understanding (1 = Need lots of practice, 10 = Fully confident)</p>
+    <div class="progress-bar">
+        <div class="progress-fill" id="overallProgress" style="width:0%"></div>
+    </div>
+    <p style="margin-top:10px;text-align:center" id="progressText">0/3 subjects completed</p>
+</div>
+<div class="subject-buttons">
+    <button onclick="openSubject('Physics')">
+        Physics
+        <span class="badge hidden" id="physBadge">✓</span>
+    </button>
+    <button onclick="openSubject('Chemistry')">
+        Chemistry
+        <span class="badge hidden" id="chemBadge">✓</span>
+    </button>
+    <button onclick="openSubject('Maths')">
+        Mathematics
+        <span class="badge hidden" id="mathBadge">✓</span>
+    </button>
+</div>
+<div class="button-group" style="margin-top:30px">
+    <button onclick="goToExamDetails()" id="proceedBtn" disabled style="background:#ccc">Proceed to Exam Details</button>
+</div>
+</div>
+
+<!-- STEP 2 -->
+<div class="container hidden" id="step2">
+<h2 id="subjectTitle"></h2>
+<div id="chapterList"></div>
+<div class="button-group">
+    <button onclick="backHome()">Back</button>
+    <button onclick="saveAndNext()">Save & Continue</button>
+</div>
+</div>
+
+<!-- STEP 3 -->
+<div class="container hidden" id="step3">
+<h2>Exam Details</h2>
+<div class="input-group">
+    <label>Exam Date:</label>
+    <input type="date" id="examDate" onchange="updateDateDisplay()">
+    <p style="color:#666;font-size:14px;margin-top:8px" id="dateDisplay"></p>
+</div>
+<div class="input-group">
+    <label>Daily Study Hours Available:</label>
+    <input type="number" id="dailyHours" value="6" min="1" max="16">
+</div>
+<div class="button-group">
+    <button onclick="backToSubjects()">Back</button>
+    <button onclick="generatePlan()">Generate Smart Plan 🚀</button>
+</div>
+</div>
+
+<!-- STEP 4 -->
+<div class="container hidden" id="step4">
+<h2>Your Date-Wise Study Schedule</h2>
+<div class="summary" id="summaryBox"></div>
+<div id="output"></div>
+<div class="button-group">
+    <button onclick="backToExam()">Edit Details</button>
+    <button onclick="downloadPDF()">Download PDF 📄</button>
+    <button onclick="resetAll()" style="background:#e74c3c">Start Over</button>
+</div>
+</div>
+
+<script>
+const physics = [
+ {sub:"Physics",name:"Units & Measurements",marks:3},
+ {sub:"Physics",name:"Kinematics",marks:4},
+ {sub:"Physics",name:"Laws of Motion",marks:4},
+ {sub:"Physics",name:"Work, Energy & Power",marks:4},
+ {sub:"Physics",name:"Centre of Mass & Rotational Motion",marks:5},
+ {sub:"Physics",name:"Gravitation",marks:3},
+ {sub:"Physics",name:"Thermodynamics",marks:4},
+ {sub:"Physics",name:"Kinetic Theory of Gases",marks:2},
+ {sub:"Physics",name:"Oscillations & Waves",marks:4},
+ {sub:"Physics",name:"Electrostatics",marks:5},
+ {sub:"Physics",name:"Current Electricity",marks:5},
+ {sub:"Physics",name:"Magnetic Effects of Current",marks:5},
+ {sub:"Physics",name:"Electromagnetic Induction",marks:4},
+ {sub:"Physics",name:"Alternating Current",marks:3},
+ {sub:"Physics",name:"Ray Optics",marks:5},
+ {sub:"Physics",name:"Wave Optics",marks:3},
+ {sub:"Physics",name:"Dual Nature of Matter",marks:3},
+ {sub:"Physics",name:"Atoms & Nuclei",marks:4},
+ {sub:"Physics",name:"Semiconductors",marks:5}
+];
+
+const chemistry = [
+ {sub:"Chemistry",name:"Some Basic Concepts of Chemistry",marks:3},
+ {sub:"Chemistry",name:"Atomic Structure",marks:3},
+ {sub:"Chemistry",name:"States of Matter",marks:3},
+ {sub:"Chemistry",name:"Thermodynamics",marks:4},
+ {sub:"Chemistry",name:"Chemical Equilibrium",marks:4},
+ {sub:"Chemistry",name:"Redox Reactions",marks:2},
+ {sub:"Chemistry",name:"Electrochemistry",marks:4},
+ {sub:"Chemistry",name:"Chemical Kinetics",marks:4},
+ {sub:"Chemistry",name:"Solutions",marks:3},
+ {sub:"Chemistry",name:"Periodic Table & Periodicity",marks:3},
+ {sub:"Chemistry",name:"Chemical Bonding",marks:4},
+ {sub:"Chemistry",name:"Coordination Compounds",marks:5},
+ {sub:"Chemistry",name:"p-Block Elements",marks:6},
+ {sub:"Chemistry",name:"d & f Block Elements",marks:5},
+ {sub:"Chemistry",name:"General Organic Chemistry (GOC)",marks:6},
+ {sub:"Chemistry",name:"Hydrocarbons",marks:4},
+ {sub:"Chemistry",name:"Haloalkanes & Haloarenes",marks:4},
+ {sub:"Chemistry",name:"Alcohols, Phenols & Ethers",marks:4},
+ {sub:"Chemistry",name:"Aldehydes, Ketones & Carboxylic Acids",marks:5},
+ {sub:"Chemistry",name:"Amines",marks:4},
+ {sub:"Chemistry",name:"Biomolecules",marks:3}
+];
+
+const maths = [
+ {sub:"Maths",name:"Sets, Relations & Functions",marks:3},
+ {sub:"Maths",name:"Trigonometry",marks:5},
+ {sub:"Maths",name:"Complex Numbers",marks:4},
+ {sub:"Maths",name:"Quadratic Equations",marks:3},
+ {sub:"Maths",name:"Sequences & Series",marks:4},
+ {sub:"Maths",name:"Permutations & Combinations",marks:4},
+ {sub:"Maths",name:"Binomial Theorem",marks:3},
+ {sub:"Maths",name:"Matrices & Determinants",marks:5},
+ {sub:"Maths",name:"Straight Lines & Conics",marks:4},
+ {sub:"Maths",name:"Limits & Continuity",marks:4},
+ {sub:"Maths",name:"Differentiation",marks:5},
+ {sub:"Maths",name:"Applications of Derivatives",marks:4},
+ {sub:"Maths",name:"Integration",marks:6},
+ {sub:"Maths",name:"Differential Equations",marks:3},
+ {sub:"Maths",name:"Vector Algebra",marks:4},
+ {sub:"Maths",name:"3D Geometry",marks:5},
+ {sub:"Maths",name:"Probability",marks:5}
+];
+
+const syllabus = [...physics, ...chemistry, ...maths];
+const subjectMap={Physics:physics,Chemistry:chemistry,Maths:maths};
+
+let ratings = {};
+let currentSubject = null;
+let studyPlan = [];
+
+function loadData(){
+    const saved = localStorage.getItem('jeeRatings');
+    if(saved) ratings = JSON.parse(saved);
+    updateProgress();
+}
+
+function saveData(){
+    localStorage.setItem('jeeRatings', JSON.stringify(ratings));
+}
+
+function updateProgress(){
+    let completed = 0;
+    if(ratings.Physics && Object.keys(ratings.Physics).length > 0){
+        completed++;
+        document.getElementById('physBadge').classList.remove('hidden');
+    }
+    if(ratings.Chemistry && Object.keys(ratings.Chemistry).length > 0){
+        completed++;
+        document.getElementById('chemBadge').classList.remove('hidden');
+    }
+    if(ratings.Maths && Object.keys(ratings.Maths).length > 0){
+        completed++;
+        document.getElementById('mathBadge').classList.remove('hidden');
+    }
+    
+    const progress = (completed / 3) * 100;
+    document.getElementById('overallProgress').style.width = progress + '%';
+    document.getElementById('progressText').innerText = `${completed}/3 subjects completed`;
+    
+    const btn = document.getElementById('proceedBtn');
+    if(completed === 3){
+        btn.disabled = false;
+        btn.style.background = '#6f85ea';
+    }
+}
+
+function openSubject(sub){
+    currentSubject = sub;
+    if(!ratings[sub]) ratings[sub] = {};
+    
+    document.getElementById("step1").classList.add("hidden");
+    document.getElementById("step2").classList.remove("hidden");
+    document.getElementById("subjectTitle").innerText = sub + " - Rate Your Understanding";
+
+    let html = "";
+    subjectMap[sub].forEach(c => {
+        let val = ratings[sub][c.name] || 5;
+        const id = `${sub}_${c.name}`.replace(/[^a-zA-Z0-9]/g, '_');
+        html += `
+        <div class="chapter">
+            <div class="chapter-header">
+                <b>${c.name}</b>
+                <span class="avg">JEE Weightage: ${c.marks} marks</span>
+            </div>
+            <div class="rating-container">
+                <span>Weak</span>
+                <input type="range" min="1" max="10" value="${val}" id="${id}"
+                    oninput="updateRating('${sub}','${c.name}','${id}')">
+                <span>Strong</span>
+                <span class="rating-value" id="${id}_val">${val}/10</span>
+            </div>
+        </div>`;
+    });
+    document.getElementById("chapterList").innerHTML = html;
+}
+
+function updateRating(sub, name, id){
+    const val = document.getElementById(id).value;
+    document.getElementById(id + '_val').innerText = val + '/10';
+    ratings[sub][name] = parseInt(val);
+}
+
+function backHome(){
+    document.getElementById("step2").classList.add("hidden");
+    document.getElementById("step1").classList.remove("hidden");
+}
+
+function saveAndNext(){
+    saveData();
+    updateProgress();
+    backHome();
+}
+
+function goToExamDetails(){
+    document.getElementById("step1").classList.add("hidden");
+    document.getElementById("step3").classList.remove("hidden");
+    
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1); // Minimum = tomorrow
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    document.getElementById("examDate").min = tomorrowStr;
+    
+    // Keep date field EMPTY - user must select manually
+    document.getElementById("examDate").value = "";
+    
+    // Clear date display
+    document.getElementById("dateDisplay").innerHTML = "Please select your exam date (minimum: tomorrow)";
+}
+
+function updateDateDisplay(){
+    const dateInput = document.getElementById("examDate");
+    const display = document.getElementById("dateDisplay");
+    if(dateInput.value){
+        const date = new Date(dateInput.value + 'T00:00:00');
+        display.innerHTML = `📅 Selected: <strong>${date.toLocaleDateString('en-IN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })}</strong>`;
+        display.style.color = "#27ae60";
+    } else {
+        display.innerHTML = "⚠️ Please select your exam date (minimum: tomorrow)";
+        display.style.color = "#e74c3c";
+    }
+}
+
+function backToSubjects(){
+    document.getElementById("step3").classList.add("hidden");
+    document.getElementById("step1").classList.remove("hidden");
+}
+
+function backToExam(){
+    document.getElementById("step4").classList.add("hidden");
+    document.getElementById("step3").classList.remove("hidden");
+}
+
+function generatePlan(){
+    const examDate = document.getElementById("examDate").value;
+    const hoursPerDay = parseInt(document.getElementById("dailyHours").value);
+    
+    if(!examDate){
+        alert("⚠️ Please select an exam date first!");
+        return;
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const exam = new Date(examDate + 'T00:00:00');
+    exam.setHours(0, 0, 0, 0);
+    const days = Math.ceil((exam - today) / (1000 * 3600 * 24));
+    
+    if(days <= 0){
+        alert("⚠️ Exam date must be at least tomorrow!");
+        return;
+    }
+    
+    document.getElementById("step3").classList.add("hidden");
+    document.getElementById("step4").classList.remove("hidden");
+    
+    const totalTime = days * hoursPerDay;
+    const totalMarks = syllabus.reduce((s, c) => s + c.marks, 0);
+
+    // Calculate weights using your algorithm
+    let weights = [];
+    let sum = 0;
+    syllabus.forEach(c => {
+        const userRating = ratings[c.sub][c.name] || 5;
+        const strength = userRating / 10;
+        const w = (c.marks / totalMarks) * (1 - strength);
+        weights.push(w);
+        sum += w;
+    });
+
+    // Calculate hours for each chapter
+    let chapterHours = syllabus.map((c, i) => ({
+        sub: c.sub,
+        name: c.name,
+        marks: c.marks,
+        rating: ratings[c.sub][c.name] || 5,
+        hrs: (totalTime * weights[i]) / sum
+    }));
+
+    // Create date-wise schedule
+    studyPlan = [];
+    let curDate = new Date();
+    curDate.setHours(0, 0, 0, 0); // Reset to midnight
+    curDate.setDate(curDate.getDate() + 1); // Start from tomorrow (live date)
+    let remaining = hoursPerDay;
+
+    chapterHours.forEach(ch => {
+        let hrs = ch.hrs;
+        while(hrs > 0){
+            if(remaining === 0 || remaining < 0.1){
+                curDate = new Date(curDate);
+                curDate.setDate(curDate.getDate() + 1);
+                remaining = hoursPerDay;
+            }
+            let used = Math.min(remaining, hrs);
+            studyPlan.push({
+                date: curDate.toDateString(),
+                sub: ch.sub,
+                name: ch.name,
+                marks: ch.marks,
+                rating: ch.rating,
+                hrs: used
+            });
+            hrs -= used;
+            remaining -= used;
+        }
+    });
+
+    // Generate summary
+    const totalHours = studyPlan.reduce((s, p) => s + p.hrs, 0);
+    const uniqueDays = new Set(studyPlan.map(p => p.date)).size;
+    
+    document.getElementById("summaryBox").innerHTML = `
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div>Days Until Exam</div>
+                <strong>${days}</strong>
+            </div>
+            <div class="summary-item">
+                <div>Total Chapters</div>
+                <strong>${syllabus.length}</strong>
+            </div>
+            <div class="summary-item">
+                <div>Study Days Needed</div>
+                <strong>${uniqueDays}</strong>
+            </div>
+            <div class="summary-item">
+                <div>Total Study Hours</div>
+                <strong>${totalHours.toFixed(1)}h</strong>
+            </div>
+        </div>
+        <p style="margin-top:15px;text-align:center">
+            ${uniqueDays <= days ?
+                `✅ Perfect! You have ${days - uniqueDays} buffer days for revision` :
+                `⚠️ Tight schedule! Focus and stay consistent`}
+        </p>
+    `;
+
+    // Generate table
+    let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Subject</th>
+                    <th>Chapter</th>
+                    <th>Your Rating</th>
+                    <th>JEE Marks</th>
+                    <th>Study Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    studyPlan.forEach(p => {
+        tableHTML += `
+            <tr>
+                <td>${p.date}</td>
+                <td>${p.sub}</td>
+                <td>${p.name}</td>
+                <td>${p.rating}/10</td>
+                <td>${p.marks}</td>
+                <td>${p.hrs.toFixed(1)}h</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `</tbody></table>`;
+    document.getElementById("output").innerHTML = tableHTML;
+}
+
+function downloadPDF(){
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text("JEE Smart Study Plan 2026", 105, 20, {align: 'center'});
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    const examDate = document.getElementById("examDate").value;
+    const dailyHours = document.getElementById("dailyHours").value;
+    const uniqueDays = new Set(studyPlan.map(p => p.date)).size;
+    
+    doc.text(`Exam Date: ${examDate}`, 20, 32);
+    doc.text(`Daily Study Hours: ${dailyHours}`, 20, 38);
+    doc.text(`Total Study Days: ${uniqueDays}`, 20, 44);
+    doc.text(`Total Chapters: ${syllabus.length}`, 20, 50);
+    
+    doc.setFontSize(9);
+    let y = 62;
+    
+    // Table header
+    doc.setFillColor(111, 133, 234);
+    doc.rect(15, y-5, 180, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont(undefined, 'bold');
+    doc.text("Date", 17, y);
+    doc.text("Subject", 55, y);
+    doc.text("Chapter", 85, y);
+    doc.text("Rating", 150, y);
+    doc.text("Hours", 175, y);
+    y += 7;
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, 'normal');
+    
+    studyPlan.forEach((p, index) => {
+        if(y > 275){
+            doc.addPage();
+            y = 20;
+            
+            // Repeat header on new page
+            doc.setFillColor(111, 133, 234);
+            doc.rect(15, y-5, 180, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont(undefined, 'bold');
+            doc.text("Date", 17, y);
+            doc.text("Subject", 55, y);
+            doc.text("Chapter", 85, y);
+            doc.text("Rating", 150, y);
+            doc.text("Hours", 175, y);
+            y += 7;
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'normal');
+        }
+        
+        // Alternate row colors
+        if(index % 2 === 0){
+            doc.setFillColor(249, 249, 249);
+            doc.rect(15, y-5, 180, 7, 'F');
+        }
+        
+        const dateShort = p.date.substring(4); // Remove day name for space
+        doc.text(dateShort, 17, y);
+        doc.text(p.sub, 55, y);
+        
+        // Truncate long chapter names
+        const chapterName = p.name.length > 25 ? p.name.substring(0, 25) + '...' : p.name;
+        doc.text(chapterName, 85, y);
+        doc.text(p.rating + "/10", 152, y);
+        doc.text(p.hrs.toFixed(1) + "h", 177, y);
+        y += 7;
+    });
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    const pageCount = doc.internal.pages.length - 1;
+    for(let i = 1; i <= pageCount; i++){
+        doc.setPage(i);
+        doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')} | Page ${i} of ${pageCount}`, 105, 290, {align: 'center'});
+    }
+    
+    doc.save("JEE-Study-Plan-2026.pdf");
+    alert("PDF downloaded successfully! 📄");
+}
+
+function resetAll(){
+    if(confirm("Are you sure? This will delete all your ratings.")){
+        ratings = {};
+        localStorage.removeItem('jeeRatings');
+        location.reload();
+    }
+}
+
+loadData();
+</script>
+
+</body>
+</html>
